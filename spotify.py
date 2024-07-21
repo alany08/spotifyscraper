@@ -104,11 +104,3 @@ def search_for_track(name = "", artist = "", isrc = None):
 		).json()
 
 	return Track(TrackObject = result["tracks"]["items"][0])
-
-
-#p = get_playlist_tracks("4NcVSxlT1ZJ31GlalJGXms")
-#download_image(p[0].cover_image_url, "image.png") these are pngs
-search_for_track(name = "10 Farewell, My Friend!.m4a", artist="Yu-Peng Chen")
-search_for_track(name = "10 Farewell, My Friend!.m4a", artist="Yu-Peng Chen")
-search_for_track(name = "10 Farewell, My Friend!.m4a", artist="Yu-Peng Chen")
-search_for_track(name = "10 Farewell, My Friend!.m4a", artist="Yu-Peng Chen")

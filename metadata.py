@@ -3,7 +3,7 @@ from track import Track
 from mutagen.id3 import APIC, error, ID3
 from mutagen.mp3 import EasyMP3, MP3
 from mutagen.flac import FLAC, Picture
-from mutagen.mp4 import MP4
+from mutagen.mp4 import MP4, MP4Cover
 from mutagen import File
 import os
 
@@ -14,7 +14,7 @@ def write_metadata(filepath, track: Track):
 
 	audio = None
 
-	if filepath.endswith(".mp3"): #add genres and tracktotals
+	if filepath.endswith(".mp3"):
 		audio = MP3(filepath)
 
 		#add thumbnail
@@ -43,14 +43,19 @@ def write_metadata(filepath, track: Track):
 		audio["date"] = track.release_date
 		#add isrc
 		audio["isrc"] = track.isrc
+		#add genre
+		audio["genre"] = track.genres
 
 		audio.save()
 
-	if filepath.endswith(".m4a"): #add cover image
+	if filepath.endswith(".m4a"):
 		audio = MP4(filepath)
 
 		#add thumbnail
-		#asdfyhasdkjh
+		with open(thumbnail_path, "rb") as f:
+			audio["covr"] = [
+				MP4Cover(f.read(), imageformat=MP4Cover.FORMAT_PNG)
+			]
 
 		#THESE ARE FROM https://mutagen.readthedocs.io/en/latest/api/mp4.html
 		#add title
@@ -66,9 +71,10 @@ def write_metadata(filepath, track: Track):
 		#add genre
 		audio["\xa9gen"] = track.genres
 		#add track num of total tracks
-		audio["trkn"] = audio["disk"] = (track.disc_no, track.totaltracks)
+		audio["trkn"] = audio["disk"] = [(int(track.disc_no), int(track.totaltracks))]
 		#ISRC, Spotify ID as comment, because not supported by itself
 		audio["\xa9cmt"] = f"ISRC:{track.isrc}\nSpotify ID:{track.spotify_id}"
+
 		audio.save()
 
 	if filepath.endswith(".flac"):
@@ -100,7 +106,7 @@ def write_metadata(filepath, track: Track):
 		#add isrc
 		audio["isrc"] = track.isrc
 		#add total tracks
-		audio["tracktotal"] = track.totaltracks
+		audio["tracktotal"] = track.totaltracks #!!!! Not supported in ID3
 		#add genres
 		audio["genre"] = track.genres
 
@@ -113,3 +119,4 @@ def write_metadata(filepath, track: Track):
 
 
 def get_metadata(filepath):
+	pass
