@@ -15,7 +15,7 @@ class Track:
 		self.genres = []
 		self.totaltracks = "0"
 		if TrackObject:
-			overwrite_with_spotify(TrackObject)
+			self.overwrite_with_spotify(TrackObject)
 	def __str__(self):
 		return json.dumps({
 			"name": self.name,

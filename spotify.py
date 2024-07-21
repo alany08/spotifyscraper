@@ -5,7 +5,7 @@ import requests
 import time
 import urllib.parse
 
-headers = {
+_headers = {
         "User-Agent": "SongOrganizer/0.1 Python/3",
         "Accept": "*/*",
         "Accept-Language": "en-US,en;q=0.5",
@@ -25,6 +25,8 @@ cached_requests = {
 def get_request(url, headers = {}):
 	global past_api_requests
 	global cached_requests
+	global config
+	global _headers
 	new_past_api_requests = []
 
 	try:
@@ -53,6 +55,16 @@ def get_request(url, headers = {}):
 		print("Got 429 on response, waiting 30 seconds")
 		time.sleep(30)
 		return get_request(url, headers = headers)
+	if response.status_code == 401:
+		key = input("Authentication key expired! Please enter another one: ")
+		config["spotify_api_bearer"] = key
+		_headers = {
+		        "User-Agent": "SongOrganizer/0.1 Python/3",
+		        "Accept": "*/*",
+		        "Accept-Language": "en-US,en;q=0.5",
+		        "Authorization": "Bearer " + config["spotify_api_bearer"],
+		}
+		return get_request(url, headers = _headers)
 	if response.status_code != 200:
 		print("Got unknown error:", response.status_code, "not retrying")
 		raise RuntimeError(response.status_code)
@@ -65,11 +77,14 @@ def get_playlist_tracks(playlistID: str):
 	nexturl = f"{config["spotify_api_root"]}/playlists/{playlistID}/tracks?offset=0&limit=50"
 	playlist_items = []
 	while nexturl:
-		response = get_request(nexturl, headers = headers).json()
+		response = get_request(nexturl, headers = _headers).json()
 		nexturl = response["next"]
 		for track in response["items"]:
 			playlist_items.append(Track(TrackObject = track["track"]))
 	return playlist_items
+
+def get_playlist_name(playlistID: str):
+	return get_request(f"{config["spotify_api_root"]}/playlists/{playlistID}", headers=headers).json()["name"]
 
 def download_image(url, path):
 	data = get_request(url).content
@@ -94,13 +109,14 @@ def search_for_track(name = "", artist = "", isrc = None):
 
 	if not isrc:
 		result = get_request(
-			f"{config["spotify_api_root"]}/search?q=track:{name} {f"artist:{artist}" if artist else ""}&type=track&limit=3&offset=0",
-			headers
+			f"{config["spotify_api_root"]}/search?q=name:{name}{f" artist:{artist}" if artist else ""}&type=track",
+			headers = _headers
 		).json()
+		print(result)
 	else:
 		result = get_request(
 			f"{config["spotify_api_root"]}/search?q=isrc:{isrc}&type=track&limit=3&offset=0",
-			headers
+			headers = _headers
 		).json()
 
 	return Track(TrackObject = result["tracks"]["items"][0])

@@ -183,7 +183,7 @@ def get_metadata(filepath):
 			track.isrc = audio["\xa9cmt"].split("\n")[0].split(":")[1]
 		except Exception:
 			try:
-				isrc = f["xid "][0].split(":")[-1]
+				track.isrc = audio["xid "][0].split(":")[-1]
 			except Exception:
 				pass
 		try:
@@ -259,8 +259,9 @@ def get_metadata(filepath):
 			pass
 
 	try:
-		if len(track.artists) == 1 and "," in track.artists[0]:
+		if len(track.artists) == 1 and ("," in track.artists[0] or "&" in track.artists[0]):
 			track.artists = track.artists[0].split(", ")
+			track.artists = track.artists[0].split(" & ")
 	except Exception:
 		pass
 
@@ -278,4 +279,4 @@ def get_bitrate(filepath):
 		raise TypeError("Invalid file extension. Please consider adding support for this audio type if you think this is a valid audio type")
 	return audio.info.bitrate
 
-print(get_metadata("/home/alan/Downloads/flac.flac"))
+print(get_metadata("/home/alan/Downloads/m4a.m4a"))
