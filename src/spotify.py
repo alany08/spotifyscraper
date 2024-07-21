@@ -3,6 +3,7 @@ from config import config
 from track import Track
 import requests
 import time
+import urllib.parse
 
 headers = {
         "User-Agent": "SongOrganizer/0.1 Python/3",
@@ -15,11 +16,23 @@ past_api_requests = [
 	time.time()
 ]
 
+cached_requests = {
+	"url": "responseobject"
+}
+
 #90 requests every 30 seconds
 
 def get_request(url, headers = {}):
 	global past_api_requests
+	global cached_requests
 	new_past_api_requests = []
+
+	try:
+		if cached_requests[url]:
+			print("Found cached request for", url)
+			return cached_requests[url]
+	except:
+		pass
 
 	time.sleep(0.25)
 
@@ -44,6 +57,7 @@ def get_request(url, headers = {}):
 		print("Got unknown error:", response.status_code, "not retrying")
 		raise RuntimeError(response.status_code)
 
+	cached_requests[url] = response
 	return response
 
 def get_playlist_tracks(playlistID: str):
@@ -57,4 +71,38 @@ def get_playlist_tracks(playlistID: str):
 			playlist_items.append(Track(TrackObject = track["track"]))
 	return playlist_items
 
-print(len(get_playlist_tracks("4NcVSxlT1ZJ31GlalJGXms")))
+def download_image(url, path):
+	data = get_request(url).content
+	with open(path, "wb") as file:
+		file.write(data)
+
+def search_for_track(name = "", artist = ""):
+	global headers
+
+	try:
+		int(name.split(" ")[0])
+		name = " ".join(name.split(" ")[1:])
+	except:
+		pass
+
+	for file_ext in config["accepted_file_extensions"]:
+		if name.endswith("." + file_ext):
+			name = name[:-(len(file_ext) + 1)]
+
+	name = urllib.parse.quote(name, safe="")
+	artist = urllib.parse.quote(artist, safe="")
+
+	result = get_request(
+		f"{config["spotify_api_root"]}/search?q=track:{name} {f"artist:{artist}" if artist else ""}&type=track&limit=3&offset=0",
+		headers
+	).json()
+	
+	return Track(TrackObject = result["tracks"]["items"][0])
+
+
+#p = get_playlist_tracks("4NcVSxlT1ZJ31GlalJGXms")
+#download_image(p[0].cover_image_url, "image.png") these are pngs
+search_for_track(name = "10 Farewell, My Friend!.m4a", artist="Yu-Peng Chen")
+search_for_track(name = "10 Farewell, My Friend!.m4a", artist="Yu-Peng Chen")
+search_for_track(name = "10 Farewell, My Friend!.m4a", artist="Yu-Peng Chen")
+search_for_track(name = "10 Farewell, My Friend!.m4a", artist="Yu-Peng Chen")

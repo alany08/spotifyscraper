@@ -11,7 +11,7 @@ class Track:
 		self.cover_image_url = ""
 		self.isrc = ""
 		if TrackObject:
-			self.name = TrackObject["name"]
+			self.name = TrackObject["name"][:64] #truncate names that are too long
 			for artist in TrackObject["artists"]:
 				self.artists.append(artist["name"])
 			self.disc_no = TrackObject["disc_number"]
