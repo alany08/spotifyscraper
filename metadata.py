@@ -120,3 +120,15 @@ def write_metadata(filepath, track: Track):
 
 def get_metadata(filepath):
 	pass
+
+def get_bitrate(filepath):
+	audio = None
+	if filepath.endswith("mp3"):
+		audio = MP3(filepath)
+	if filepath.endswith("m4a"):
+		audio = MP4(filepath)
+	if filepath.endswith("flac"):
+		audio = FLAC(filepath)
+	if not audio:
+		raise TypeError("Invalid file extension. Please consider adding support for this audio type if you think this is a valid audio type")
+	return audio.info.bitrate
