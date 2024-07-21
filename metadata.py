@@ -27,7 +27,6 @@ def write_metadata(filepath, track: Track):
 					data=open(thumbnail_path, "rb").read()
 			)
 		)
-		audio.save()
 
 		audio = EasyMP3(filepath)
 
@@ -36,7 +35,7 @@ def write_metadata(filepath, track: Track):
 		#add artist
 		audio["artist"] = track.artists
 		#add disc number
-		audio["tracknumber"] = track.disc_no
+		audio["tracknumber"] = track.disc_no + "/" + track.totaltracks
 		#add album
 		audio["album"] = track.album
 		#add release date
@@ -67,7 +66,7 @@ def write_metadata(filepath, track: Track):
 		#add album artists
 		audio["aART"] = track.albumartists #!!!! Not supported in ID3
 		#add release date
-		audio["\xa9alb"] = track.release_date
+		audio["\xa9day"] = track.release_date
 		#add genre
 		audio["\xa9gen"] = track.genres
 		#add track num of total tracks
@@ -119,7 +118,153 @@ def write_metadata(filepath, track: Track):
 
 
 def get_metadata(filepath):
-	pass
+	
+	audio = None
+
+	if filepath.endswith(".mp3"):
+		track = Track()
+		audio = EasyMP3(filepath)
+		#add title
+		try:
+			track.name = audio["title"][0]
+		except Exception:
+			pass
+		try:
+			track.artists = audio["artist"]
+		except Exception:
+			pass
+		try:
+			track.disc_no = audio["tracknumber"][0]
+		except Exception:
+			pass
+		try:
+			track.album = audio["album"][0]
+		except Exception:
+			pass
+		try:
+			track.release_date = audio["date"][0]
+		except Exception:
+			pass
+		try:
+			track.isrc = audio["isrc"][0]
+		except Exception:
+			pass
+		try:
+			track.genres = audio["genre"]
+		except Exception:
+			pass
+
+	if filepath.endswith(".m4a"):
+		track = Track()
+		audio = MP4(filepath)
+
+		#add title
+		try:
+			track.name = audio["\xa9nam"][0]
+		except Exception:
+			pass
+		try:
+			track.artists = audio["\xa9ART"]
+		except Exception:
+			pass
+		try:
+			track.disc_no, track.totaltracks = audio["trkn"][0]
+		except Exception:
+			pass
+		try:
+			track.album = audio["\xa9alb"][0]
+		except Exception:
+			pass
+		try:
+			track.release_date = audio["\xa9day"][0]
+		except Exception:
+			pass
+		try:
+			track.isrc = audio["\xa9cmt"].split("\n")[0].split(":")[1]
+		except Exception:
+			try:
+				isrc = f["xid "][0].split(":")[-1]
+			except Exception:
+				pass
+		try:
+			track.spotify_id = audio["\xa9cmt"].split("\n")[1].split(":")[1]
+		except Exception:
+			pass
+		try:
+			track.genres = audio["\xa9gen"]
+		except Exception:
+			pass
+		try:
+			track.albumartists = audio["aART"]
+		except Exception:
+			pass
+
+	if filepath.endswith(".flac"):
+		track = Track()
+		audio = FLAC(filepath)
+
+		#add title
+		try:
+			track.name = audio["title"][0]
+		except Exception:
+			pass
+		try:
+			track.artists = audio["artist"]
+		except Exception:
+			pass
+		try:
+			track.disc_no = audio["tracknumber"][0]
+		except Exception:
+			pass
+		try:
+			track.totaltracks = audio["tracktotal"][0]
+		except Exception:
+			pass
+		try:
+			track.album = audio["album"][0]
+		except Exception:
+			pass
+		try:
+			track.release_date = audio["date"][0]
+		except Exception:
+			pass
+		try:
+			track.isrc = audio["isrc"][0]
+		except Exception:
+			pass
+		try:
+			track.spotify_id = audio["spotifyid"]
+		except Exception:
+			pass
+		try:
+			track.genres = audio["genre"]
+		except Exception:
+			pass
+		try:
+			track.albumartists = audio["albumartists"]
+		except Exception:
+			pass
+
+	#if not audio:
+	#	raise TypeError("Filepath given was not an recognized audio format (mp3, m4a, flac). If this is an audio format, consider adding it in metadata.py")
+
+	#sometimes disc_no is num/num
+	try:
+		int(track.disc_no)
+	except Exception:
+		try:
+			track.totaltracks = track.disc_no.split("/")[1]
+			track.disc_no = track.disc_no.split("/")[0]
+		except Exception:
+			pass
+
+	try:
+		if len(track.artists) == 1 and "," in track.artists[0]:
+			track.artists = track.artists[0].split(", ")
+	except Exception:
+		pass
+
+	return track
 
 def get_bitrate(filepath):
 	audio = None
@@ -132,3 +277,5 @@ def get_bitrate(filepath):
 	if not audio:
 		raise TypeError("Invalid file extension. Please consider adding support for this audio type if you think this is a valid audio type")
 	return audio.info.bitrate
+
+print(get_metadata("/home/alan/Downloads/flac.flac"))
