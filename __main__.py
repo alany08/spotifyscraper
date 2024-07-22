@@ -8,6 +8,9 @@ import json
 import os
 import sys
 
+if not os.path.exists("tmp"):
+	os.mkdir("tmp")
+
 indexer.flatten_to(config["music_root_directory"], config["target_music_directory"] + "/songs")
 
 all_files = indexer.get_all_files(config["target_music_directory"] + "/songs")
@@ -81,7 +84,7 @@ for isrc in _SONGS_.keys():
 	new_songs[isrc] = _SONGS_[isrc]
 	new_songs[isrc]["track"] = json.loads(str(new_songs[isrc]["track"]))
 
-with open("index.json", "w") as f:
+with open("tmp/index.json", "w") as f:
 	json.dump(new_songs, f, indent = 4)
 
 to_remove = []
@@ -89,6 +92,7 @@ for isrc in _SONGS_.keys():
 	for path in _SONGS_[isrc]["paths"]:
 		to_remove.append(path)
 
+print("An index of all your files (PRIOR TO CLEANING) can be found in tmp/index.json")
 print(f"Found {len(to_remove)} duplicates, they will be removed!")
 input("Finished indexing all songs, press enter to continue")
 

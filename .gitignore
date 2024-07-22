@@ -4,8 +4,7 @@ __pycache__/
 *$py.class
 
 config.py
-index.json
-apicache.pickle
+tmp/*
 
 # C extensions
 *.so

@@ -21,7 +21,7 @@ cached_requests = {
 	"url": "responseobject"
 }
 try:
-	with open("apicache.pickle", "rb") as f:
+	with open("tmp/apicache.pickle", "rb") as f:
 		cached_requests = pickle.load(f)
 except Exception:
 	print("Couldn't load response cache")
@@ -79,7 +79,7 @@ def get_request(url, headers = {}, ratelimited = False):
 		raise RuntimeError(response.status_code)
 
 	cached_requests[url] = response
-	pickle.dump(cached_requests, open("apicache.pickle", "w"))
+	pickle.dump(cached_requests, open("tmp/apicache.pickle", "w"))
 	return response
 
 def get_playlist_tracks(playlistID: str):
