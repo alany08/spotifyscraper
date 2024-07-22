@@ -16,12 +16,13 @@ if not os.path.exists("tmp/spotifytoken.txt"):
 
 def reload_token():
 	global _headers
-	_headers = {
-	        "User-Agent": "SongOrganizer/0.5 Python/3",
-	        "Accept": "*/*",
-	        "Accept-Language": "en-US,en;q=0.5",
-	        "Authorization": "Bearer " + open("tmp/spotifytoken.txt").read(),
-	}
+	with open("tmp/spotifytoken.txt") as f:
+		_headers = {
+		        "User-Agent": "SongOrganizer/0.5 Python/3",
+		        "Accept": "*/*",
+		        "Accept-Language": "en-US,en;q=0.5",
+		        "Authorization": "Bearer " + f.read(),
+		}
 reload_token()
 
 past_api_requests = [
@@ -39,7 +40,7 @@ except Exception:
 
 #90 requests every 30 seconds
 
-def get_request(url, headers = {}, ratelimited = False):
+def get_request(url, headers = {}, ratelimited = False, nocache = False):
 	global past_api_requests
 	global cached_requests
 	global config
@@ -47,7 +48,7 @@ def get_request(url, headers = {}, ratelimited = False):
 	new_past_api_requests = []
 
 	try:
-		if cached_requests[url]:
+		if cached_requests[url] and not nocache:
 			print("Found cached request for", url)
 			return cached_requests[url]
 	except:
@@ -85,7 +86,8 @@ def get_request(url, headers = {}, ratelimited = False):
 		raise RuntimeError(response.status_code)
 
 	cached_requests[url] = response
-	pickle.dump(cached_requests, open("tmp/apicache.pickle", "wb"))
+	with open("tmp/apicache.pickle", "wb") as f:
+		pickle.dump(cached_requests, f)
 	return response
 
 def get_playlist_tracks(playlistID: str):
@@ -93,14 +95,14 @@ def get_playlist_tracks(playlistID: str):
 	nexturl = f"{config["spotify_api_root"]}/playlists/{playlistID}/tracks?offset=0&limit=50"
 	playlist_items = []
 	while nexturl:
-		response = get_request(nexturl, headers = _headers).json()
+		response = get_request(nexturl, headers = _headers, nocache = True).json()
 		nexturl = response["next"]
 		for track in response["items"]:
 			playlist_items.append(Track(TrackObject = track["track"]))
 	return playlist_items
 
 def get_playlist_name(playlistID: str):
-	return get_request(f"{config["spotify_api_root"]}/playlists/{playlistID}", headers=headers).json()["name"]
+	return get_request(f"{config["spotify_api_root"]}/playlists/{playlistID}", headers = _headers, nocache = True).json()["name"]
 
 def download_image(url, path):
 	data = get_request(url).content

@@ -7,6 +7,19 @@ from manual_isrc import defined_songs
 import json
 import os
 import sys
+import shutil
+
+if not os.path.exists(config["target_music_directory"] + "/songs"):
+	os.mkdir(config["target_music_directory"] + "/songs")
+
+if len(os.listdir(config["target_music_directory"] + "/songs")) != 0:
+	yn = input("Directory already contains songs, would you like to remove all of them? [y/N]: ")
+	if not yn or yn.lower() == "n":
+		print("Cannot continue, user aborted request to remove all existing songs")
+		sys.exit()
+	else:
+		shutil.rmtree(config["target_music_directory"] + "/songs")
+		os.mkdir(config["target_music_directory"] + "/songs")
 
 if not os.path.exists("tmp"):
 	os.mkdir("tmp")
@@ -124,3 +137,39 @@ for file in all_files:
 		metadata.write_metadata(file, data)
 	else:
 		print("Already have spotify's metadata for", data.isrc, data.name, "skipping it!")
+
+input("Finished processing metadata for " + str(len(all_files)) + " files. Press enter to continue")
+
+indexer.rename_files_by_metadata(all_files)
+
+input("Finished renaming " + str(len(all_files)) + " files. Press enter to continue")
+
+music_files = {
+	"isrc": "filepath"
+}
+
+all_files = indexer.get_all_files(config["target_music_directory"] + "/songs")
+
+for file in all_files:
+	print("Reindexing", file)
+	data = metadata.get_metadata(file)
+	music_files[data.isrc] = file
+
+input("Finished reindexing " + str(len(all_files)) + " files. Press enter to continue")
+
+for playlist in config["playlist_ids"]:
+	playlist_name = spotify.get_playlist_name(playlist)
+	print("Creating m3u playlist for playlist", playlist, playlist_name)
+	playlist_items = spotify.get_playlist_tracks(playlist)
+	print("Found", len(playlist_items), "items in playlist")
+	playlist_text = "#EXTM3U"
+	for item in playlist_items:
+		try:
+			#Ignore runtime, lol
+			playlist_text = playlist_text + f"\n\n#EXTINF:1,{item.name}\n./songs/{os.path.split(music_files[item.isrc])[1]}"
+		except KeyError:
+			print("This song from", playlist_name, "was not found in your library:\n" + str(item))
+	with open(config["target_music_directory"] + "/" + indexer.sanitize_filename(playlist_name + ".m3u"), "w") as playlist_file:
+		playlist_file.write(playlist_text)
+
+print("All done! Playlists are in the root directory, songs are in songs/")

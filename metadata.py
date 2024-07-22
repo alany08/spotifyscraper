@@ -9,24 +9,29 @@ import os
 
 def write_metadata(filepath, track: Track):
 
-	thumbnail_path = track.isrc + ".png"
-	download_image(track.cover_image_url, thumbnail_path)
+	try:
+		thumbnail_path = track.isrc + ".png"
+		download_image(track.cover_image_url, thumbnail_path)
+	except:
+		thumbnail_path = None
 
 	audio = None
 
 	if filepath.endswith(".mp3"):
-		audio = MP3(filepath)
-
-		#add thumbnail
-		audio.tags.add(
-			APIC(
-					encoding=0,
-					mime="image/png",
-					type=3,
-					desc=u"Cover",
-					data=open(thumbnail_path, "rb").read()
+		if thumbnail_path:
+			audio = MP3(filepath)
+			with open(thumbnail_path, "rb") as f:
+				data = f.read()
+			#add thumbnail
+			audio.tags.add(
+				APIC(
+						encoding=0,
+						mime="image/png",
+						type=3,
+						desc=u"Cover",
+						data=data
+				)
 			)
-		)
 
 		audio = EasyMP3(filepath)
 
@@ -50,11 +55,12 @@ def write_metadata(filepath, track: Track):
 	if filepath.endswith(".m4a"):
 		audio = MP4(filepath)
 
-		#add thumbnail
-		with open(thumbnail_path, "rb") as f:
-			audio["covr"] = [
-				MP4Cover(f.read(), imageformat=MP4Cover.FORMAT_PNG)
-			]
+		if thumbnail_path:
+			#add thumbnail
+			with open(thumbnail_path, "rb") as f:
+				audio["covr"] = [
+					MP4Cover(f.read(), imageformat=MP4Cover.FORMAT_PNG)
+				]
 
 		#THESE ARE FROM https://mutagen.readthedocs.io/en/latest/api/mp4.html
 		#add title
@@ -79,14 +85,15 @@ def write_metadata(filepath, track: Track):
 	if filepath.endswith(".flac"):
 		audio = FLAC(filepath)
 
-		#add thumbnail
-		image = Picture()
-		image.type = 3
-		mime = "image/png"
-		image.desc = "front cover"
-		with open(thumbnail_path, "rb") as f:
-			image.data = f.read()
-		audio.add_picture(image)
+		if thumbnail_path:
+			#add thumbnail
+			image = Picture()
+			image.type = 3
+			mime = "image/png"
+			image.desc = "front cover"
+			with open(thumbnail_path, "rb") as f:
+				image.data = f.read()
+			audio.add_picture(image)
 
 		#add title
 		audio["title"] = track.name
