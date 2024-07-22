@@ -169,7 +169,7 @@ for playlist in config["playlist_ids"]:
 			playlist_text = playlist_text + f"\n\n#EXTINF:1,{item.name}\n./songs/{os.path.split(music_files[item.isrc])[1]}"
 		except KeyError:
 			print("This song from", playlist_name, "was not found in your library:\n" + str(item))
-	with open(config["target_music_directory"] + "/" + indexer.sanitize_filename(playlist_name + ".m3u"), "w") as playlist_file:
+	with open(config["target_music_directory"] + "/" + indexer.sanitize_filename(playlist_name + ".m3u8"), "w") as playlist_file:
 		playlist_file.write(playlist_text)
 
 print("All done! Playlists are in the root directory, songs are in songs/")
