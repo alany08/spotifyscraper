@@ -100,7 +100,7 @@ def write_metadata(filepath, track: Track):
 		#add artist
 		audio["artist"] = track.artists
 		#add disc number
-		audio["tracknumber"] = track.disc_no
+		audio["tracknumber"] = audio["discnumber"] = track.disc_no
 		#add spotify id
 		audio["spotifyid"] = track.spotify_id #!!!! Not supported in ID3
 		#add album

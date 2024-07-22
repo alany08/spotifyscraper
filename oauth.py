@@ -5,6 +5,7 @@ import requests
 import base64
 import sys
 import os
+import signal
 
 app = Flask(__name__)
 
@@ -49,9 +50,8 @@ def get_user_token(code):
         except KeyError:
             print("Failed to retrieve access token.")
             file.write("FAILED TO GET SPOTIFY TOKEN")
-    
-    # Commenting out sys.exit() for manual testing
-    # sys.exit()
+    #Exit the server
+    os.kill(os.getpid(), signal.SIGINT)
 
 def begin():
     global app

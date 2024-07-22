@@ -139,6 +139,10 @@ for file in all_files:
 				except Exception as e:
 					print("Unable to lookup metadata for", data.isrc, data.name, "due to reason", e)
 					print("Skipping...")
+					sys.exit()
+		if not data.isrc:
+			print(data)
+			sys.exit()
 		metadata.write_metadata(file, data)
 	else:
 		print("Already have spotify's metadata for", data.isrc, data.name, "skipping it!")
