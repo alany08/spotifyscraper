@@ -5,13 +5,24 @@ import requests
 import time
 import urllib.parse
 import pickle
+import os
+import oauth
 
-_headers = {
-        "User-Agent": "SongOrganizer/0.1 Python/3",
-        "Accept": "*/*",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Authorization": "Bearer " + config["spotify_api_bearer"],
-}
+_headers = {}
+
+if not os.path.exists("tmp/spotifytoken.txt"):
+	with open("tmp/spotifytoken.txt", "w") as f:
+		f.write("WAITING FOR OAUTH")
+
+def reload_token():
+	global _headers
+	_headers = {
+	        "User-Agent": "SongOrganizer/0.5 Python/3",
+	        "Accept": "*/*",
+	        "Accept-Language": "en-US,en;q=0.5",
+	        "Authorization": "Bearer " + open("tmp/spotifytoken.txt").read(),
+	}
+reload_token()
 
 past_api_requests = [
 	time.time()
@@ -58,28 +69,23 @@ def get_request(url, headers = {}, ratelimited = False):
 	response = requests.get(url, headers = headers)
 	if response.status_code == 429:
 		if ratelimited:
-			print("Getting multiple 429's in a row, waiting 10 minutes")
-			time.sleep(300)
+			input("Getting multiple 429's in a row, will wait for user input to continue. Please press enter to try again")
 		else:
-			print("Got 429 on response, waiting 60 seconds")
-			time.sleep(60)
+			retry_after = int(response.headers["retry-after"])
+			print(f"Got 429 on response, waiting {retry_after} seconds")
+			time.sleep(retry_after)
 		return get_request(url, headers = headers, ratelimited = True)
 	if response.status_code == 401:
-		key = input("Authentication key expired! Please enter another one: ")
-		config["spotify_api_bearer"] = key
-		_headers = {
-		        "User-Agent": "SongOrganizer/0.1 Python/3",
-		        "Accept": "*/*",
-		        "Accept-Language": "en-US,en;q=0.5",
-		        "Authorization": "Bearer " + config["spotify_api_bearer"],
-		}
+		key = input("Authentication key expired! Press enter to reauthenticate")
+		oauth.begin()
+		reload_token()
 		return get_request(url, headers = _headers)
 	if response.status_code != 200:
 		print("Got unknown error:", response.status_code, "not retrying")
 		raise RuntimeError(response.status_code)
 
 	cached_requests[url] = response
-	pickle.dump(cached_requests, open("tmp/apicache.pickle", "w"))
+	pickle.dump(cached_requests, open("tmp/apicache.pickle", "wb"))
 	return response
 
 def get_playlist_tracks(playlistID: str):

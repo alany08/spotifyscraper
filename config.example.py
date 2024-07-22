@@ -5,6 +5,7 @@ config = {
 	"accepted_file_extensions": ["flac", "mp3", "m4a"],
 	"ratelimit_limit": 30,
 	"ratelimit_duration": 30,
-	"spotify_api_bearer": "[redacted]",
+	"spotify_client_id": "[redacted]",
+	"spotify_client_secret": "[redacted]",
 	"playlist_ids": ["enter_playlist_ids"]
 }
