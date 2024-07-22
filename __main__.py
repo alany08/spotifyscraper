@@ -164,6 +164,8 @@ for file in all_files:
 
 input("Finished reindexing " + str(len(all_files)) + " files. Press enter to continue")
 
+notfoundstr = ""
+
 for playlist in config["playlist_ids"]:
 	playlist_name = spotify.get_playlist_name(playlist)
 	print("Creating m3u playlist for playlist", playlist, playlist_name)
@@ -176,7 +178,12 @@ for playlist in config["playlist_ids"]:
 			playlist_text = playlist_text + f"\n\n#EXTINF:1,{item.name}\n./songs/{os.path.split(music_files[item.isrc])[1]}"
 		except KeyError:
 			print("This song from", playlist_name, "was not found in your library:\n" + str(item))
+			notfoundstr = notfoundstr + f"PLAYLIST: {playlist_name}\n{str(item)}\n"
 	with open(config["target_music_directory"] + "/" + indexer.sanitize_filename(playlist_name + ".m3u8"), "w") as playlist_file:
 		playlist_file.write(playlist_text)
 
+with open("tmp/notfound.txt", "w") as notfound:
+	notfound.write(notfoundstr)
+
+print("A list of all the songs from playlists that were not found can be found in tmp/notfound.txt")
 print("All done! Playlists are in the root directory, songs are in songs/")
