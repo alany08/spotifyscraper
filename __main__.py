@@ -5,6 +5,8 @@ from track import Track
 from config import config
 from manual_isrc import defined_songs
 import json
+import os
+import sys
 
 indexer.flatten_to(config["music_root_directory"], config["target_music_directory"] + "/songs")
 
@@ -62,6 +64,8 @@ for file in all_files:
 			_SONGS_[data.isrc]["paths"].append(_SONGS_[data.isrc]["highest_bitrate_path"])
 			_SONGS_[data.isrc]["highest_bitrate_path"] = file
 			_SONGS_[data.isrc]["track"] = data
+		else:
+			_SONGS_[data.isrc]["paths"].append(file)
 	else:
 		print("Creating new entry for", data.isrc)
 		_SONGS_[data.isrc] = {
@@ -71,5 +75,48 @@ for file in all_files:
 			"track": data
 		}
 
+#dump the result
+new_songs = {}
 for isrc in _SONGS_.keys():
-	pass
+	new_songs[isrc] = _SONGS_[isrc]
+	new_songs[isrc]["track"] = json.loads(str(new_songs[isrc]["track"]))
+
+with open("index.json", "w") as f:
+	json.dump(new_songs, f, indent = 4)
+
+to_remove = []
+for isrc in _SONGS_.keys():
+	for path in _SONGS_[isrc]["paths"]:
+		to_remove.append(path)
+
+print(f"Found {len(to_remove)} duplicates, they will be removed!")
+input("Finished indexing all songs, press enter to continue")
+
+for f in to_remove:
+	print("Removing lower bitrate duplicate:", f)
+	os.remove(f)
+
+input("Finished cleaning up duplicate songs, press enter to continue")
+
+all_files = indexer.get_all_files(config["target_music_directory"] + "/songs")
+
+for file in all_files:
+	data = metadata.get_metadata(file)
+	if not data.spotify_id:
+		print("Did not request metadata from spotify yet for", data.isrc, data.name)
+		try:
+			data = spotify.search_for_track(isrc = data.isrc)
+		except Exception:
+			print("Looks like ISRC failed, looking up via name and artist")
+			try:
+				data = spotify.search_for_track(name = data.name, artist = data.artists[0])
+			except Exception:
+				print("Looks like looking up with the artist and name didn't work either, trying only name")
+				try:
+					data = spotify.search_for_track(name = data.name)
+				except Exception as e:
+					print("Unable to lookup metadata for", data.isrc, data.name, "due to reason", e)
+					print("Skipping...")
+		metadata.write_metadata(file, data)
+	else:
+		print("Already have spotify's metadata for", data.isrc, data.name, "skipping it!")

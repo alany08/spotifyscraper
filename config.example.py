@@ -3,6 +3,8 @@ config = {
 	"target_music_directory": "directory to dump the music in",
 	"spotify_api_root": "https://api.spotify.com/v1",
 	"accepted_file_extensions": ["flac", "mp3", "m4a"],
+	"ratelimit_limit": 30,
+	"ratelimit_duration": 30,
 	"spotify_api_bearer": "[redacted]",
 	"playlist_ids": ["enter_playlist_ids"]
 }

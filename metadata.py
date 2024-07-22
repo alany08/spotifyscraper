@@ -278,5 +278,3 @@ def get_bitrate(filepath):
 	if not audio:
 		raise TypeError("Invalid file extension. Please consider adding support for this audio type if you think this is a valid audio type")
 	return audio.info.bitrate
-
-print(get_metadata("/home/alan/Downloads/m4a.m4a"))
