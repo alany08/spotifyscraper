@@ -127,7 +127,7 @@ def search_for_track(name = "", artist = "", isrc = None):
 
 	if not isrc:
 		result = get_request(
-			f"{config["spotify_api_root"]}/search?q=name:{name}{f" artist:{artist}" if artist else ""}&type=track",
+			f"{config["spotify_api_root"]}/search?q=name:{name}{f"artist:{artist}" if artist else ""}&type=track",
 			headers = _headers
 		).json()
 	else:

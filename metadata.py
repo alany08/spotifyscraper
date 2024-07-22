@@ -187,7 +187,7 @@ def get_metadata(filepath):
 		except Exception:
 			pass
 		try:
-			track.isrc = audio["\xa9cmt"].split("\n")[0].split(":")[1]
+			track.isrc = audio["\xa9cmt"][0].split("\n")[0].split(":")[1]
 		except Exception:
 			try:
 				track.isrc = audio["xid "][0].split(":")[-1]

@@ -139,10 +139,6 @@ for file in all_files:
 				except Exception as e:
 					print("Unable to lookup metadata for", data.isrc, data.name, "due to reason", e)
 					print("Skipping...")
-					sys.exit()
-		if not data.isrc:
-			print(data)
-			sys.exit()
 		metadata.write_metadata(file, data)
 	else:
 		print("Already have spotify's metadata for", data.isrc, data.name, "skipping it!")
@@ -162,6 +158,8 @@ all_files = indexer.get_all_files(config["target_music_directory"] + "/songs")
 for file in all_files:
 	print("Reindexing", file)
 	data = metadata.get_metadata(file)
+	if not data.isrc:
+		sys.exit()
 	music_files[data.isrc] = file
 
 input("Finished reindexing " + str(len(all_files)) + " files. Press enter to continue")
