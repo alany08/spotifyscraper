@@ -9,11 +9,6 @@ import os
 import sys
 
 def write_metadata(filepath, track: Track):
-	f = get_metadata(filepath)
-	if f.isrc != track.isrc:
-		print("Modifying ISRC!", track, f)
-		sys.exit()
-
 	try:
 		thumbnail_path = track.isrc + ".png"
 		download_image(track.cover_image_url, thumbnail_path)
