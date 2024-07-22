@@ -50,9 +50,10 @@ for file in all_files:
 		print("ISRC not found for", file)
 		success = False
 		try:
-			if(defined_songs[data.name]):
+			if defined_songs[data.name]:
 				print("Found a predefined ISRC!")
 				data.isrc = defined_songs[data.name]
+				metadata.write_metadata(file, data)
 				success = True
 		except:
 			pass
@@ -122,7 +123,11 @@ for file in all_files:
 	if not data.spotify_id:
 		print("Did not request metadata from spotify yet for", data.isrc, data.name)
 		try:
-			data = spotify.search_for_track(isrc = data.isrc)
+			if data.isrc:
+				data = spotify.search_for_track(isrc = data.isrc)
+			else:
+				print("No ISRC found in file, let's continue to using the name")
+				raise Exception()
 		except Exception:
 			print("Looks like ISRC failed, looking up via name and artist")
 			try:

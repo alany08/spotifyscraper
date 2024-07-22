@@ -6,8 +6,13 @@ from mutagen.flac import FLAC, Picture
 from mutagen.mp4 import MP4, MP4Cover
 from mutagen import File
 import os
+import sys
 
 def write_metadata(filepath, track: Track):
+	f = get_metadata(filepath)
+	if f.isrc != track.isrc:
+		print("Modifying ISRC!", track, f)
+		sys.exit()
 
 	try:
 		thumbnail_path = track.isrc + ".png"
