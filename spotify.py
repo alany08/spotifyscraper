@@ -160,5 +160,7 @@ def search_for_track(name = "", artist = "", isrc = None):
 			print("WARNING: Artist strict match failed, falling back to first result")
 			input("Press enter to confirm, or modify the metadata of the originating file and rerun this script")
 			found_track = result["tracks"]["items"][0]
+	else:
+		found_track = result["tracks"]["items"][0]
 
 	return Track(TrackObject = found_track)
