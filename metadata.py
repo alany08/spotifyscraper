@@ -9,6 +9,16 @@ import os
 import sys
 
 def write_metadata(filepath, track: Track):
+	curr_data = get_metadata(filepath)
+	if curr_data.isrc != track.isrc and curr_data.isrc:
+		print("MODIFYING ISRC")
+		print(f"{isrc} -> {track.isrc}")
+		print(filepath)
+		print("FROM")
+		print(curr_data)
+		print("TO")
+		print(track)
+		input("Press enter to confirm")
 	try:
 		thumbnail_path = track.isrc + ".png"
 		download_image(track.cover_image_url, thumbnail_path)
@@ -39,8 +49,10 @@ def write_metadata(filepath, track: Track):
 		audio["title"] = track.name
 		#add artist
 		audio["artist"] = track.artists
-		#add disc number
-		audio["tracknumber"] = track.disc_no + "/" + track.totaltracks
+		#add track number
+		audio["tracknumber"] = track.track_no  + "/" + track.totaltracks
+		#disc number, we don't have the info for total # of tracks
+		audio["discnumber"] = track.disc_no 
 		#add album
 		audio["album"] = track.album
 		#add release date
@@ -76,7 +88,9 @@ def write_metadata(filepath, track: Track):
 		#add genre
 		audio["\xa9gen"] = track.genres
 		#add track num of total tracks
-		audio["trkn"] = audio["disk"] = [(int(track.disc_no), int(track.totaltracks))]
+		audio["trkn"] = [(int(track.track_no), int(track.totaltracks))]
+		#disc number
+		audio["disk"] = [(int(track.disc_no), 1)] # we dont have info for total discs
 		#ISRC, Spotify ID as comment, because not supported by itself
 		audio["\xa9cmt"] = f"ISRC:{track.isrc}\nSpotify ID:{track.spotify_id}"
 
@@ -100,7 +114,9 @@ def write_metadata(filepath, track: Track):
 		#add artist
 		audio["artist"] = track.artists
 		#add disc number
-		audio["tracknumber"] = audio["discnumber"] = track.disc_no
+		audio["tracknumber"] = track.track_no
+		#add disc number
+		audio["discnumber"] = track.disc_no
 		#add spotify id
 		audio["spotifyid"] = track.spotify_id #!!!! Not supported in ID3
 		#add album
@@ -141,7 +157,7 @@ def get_metadata(filepath):
 		except Exception:
 			pass
 		try:
-			track.disc_no = audio["tracknumber"][0]
+			track.track_no = audio["tracknumber"][0]
 		except Exception:
 			pass
 		try:
@@ -175,7 +191,7 @@ def get_metadata(filepath):
 		except Exception:
 			pass
 		try:
-			track.disc_no, track.totaltracks = audio["trkn"][0]
+			track.track_no, track.totaltracks = audio["trkn"][0]
 		except Exception:
 			pass
 		try:
@@ -220,7 +236,7 @@ def get_metadata(filepath):
 		except Exception:
 			pass
 		try:
-			track.disc_no = audio["tracknumber"][0]
+			track.track_no = audio["tracknumber"][0]
 		except Exception:
 			pass
 		try:
@@ -257,11 +273,11 @@ def get_metadata(filepath):
 
 	#sometimes disc_no is num/num
 	try:
-		int(track.disc_no)
+		int(track.track_no)
 	except Exception:
 		try:
-			track.totaltracks = track.disc_no.split("/")[1]
-			track.disc_no = track.disc_no.split("/")[0]
+			track.totaltracks = track.track_no.split("/")[1]
+			track.track_no = track.track_no.split("/")[0]
 		except Exception:
 			pass
 

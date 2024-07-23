@@ -6,6 +6,7 @@ class Track:
 		self.name = ""
 		self.artists = []
 		self.disc_no = "0"
+		self.track_no = "0"
 		self.spotify_id = ""
 		self.album = ""
 		self.albumartists = []
@@ -39,6 +40,7 @@ class Track:
 			except:
 				print("No genres for artist", artist["name"])
 		self.disc_no = str(TrackObject["disc_number"])
+		self.track_no = str(TrackObject["track_number"])
 		self.spotify_id = TrackObject["id"]
 		self.album = TrackObject["album"]["name"]
 		for artist in TrackObject["album"]["artists"]:

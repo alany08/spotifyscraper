@@ -132,8 +132,32 @@ def search_for_track(name = "", artist = "", isrc = None):
 		).json()
 	else:
 		result = get_request(
-			f"{config["spotify_api_root"]}/search?q=isrc:{isrc}&type=track&limit=3&offset=0",
+			f"{config["spotify_api_root"]}/search?q=isrc:{isrc}&type=track&limit=5&offset=0",
 			headers = _headers
 		).json()
 
-	return Track(TrackObject = result["tracks"]["items"][0])
+	#try a strict artist match, then fallback to first result (strict case insensitive)
+	found_track = None
+	#it's url encoded for some reason
+	artist = urllib.parse.unquote(artist)
+	name_character_blacklist = [" ", ",", ".", "!", "?", "@", "-"]
+	for char in name_character_blacklist:
+		artist = artist.replace(char, "")
+	for track in result["tracks"]["items"]:
+		artists = []
+		for a in track["artists"]:
+			n = a["name"].lower()
+			for char in name_character_blacklist:
+				n = n.replace(char, "")
+			artists.append(n)
+		print(artists)
+		print(artist.lower())
+		if artist.lower() in artists:
+			found_track = track
+			break
+	if not found_track:
+		print("WARNING: Artist strict match failed, falling back to first result")
+		input("Press enter to confirm, or modify the metadata of the originating file and rerun this script")
+		found_track = result["tracks"]["items"][0]
+
+	return Track(TrackObject = found_track)
