@@ -12,7 +12,7 @@ def write_metadata(filepath, track: Track):
 	curr_data = get_metadata(filepath)
 	if curr_data.isrc != track.isrc and curr_data.isrc:
 		print("MODIFYING ISRC")
-		print(f"{isrc} -> {track.isrc}")
+		print(f"{curr_data.isrc} -> {track.isrc}")
 		print(filepath)
 		print("FROM")
 		print(curr_data)
