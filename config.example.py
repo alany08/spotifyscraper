@@ -8,5 +8,6 @@ config = {
 	"spotify_client_id": "[redacted]",
 	"spotify_client_secret": "[redacted]",
 	"playlist_ids": ["enter_playlist_ids"],
-	"output_bitrate": 256000
+	"output_bitrate": 256000,
+	"thread_cap": 30
 }
