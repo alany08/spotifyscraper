@@ -33,8 +33,7 @@ def rename_files_by_metadata(files):
 			if os.path.exists(target_fname):
 				print("Path exists!!", f)
 				input()
-			shutil.copy2(f, target_fname)
-			os.remove(f)
+			os.rename(f, target_fname)
 		else:
 			print("No need to move", f)
 
