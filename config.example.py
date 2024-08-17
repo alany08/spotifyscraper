@@ -7,5 +7,6 @@ config = {
 	"ratelimit_duration": 30,
 	"spotify_client_id": "[redacted]",
 	"spotify_client_secret": "[redacted]",
-	"playlist_ids": ["enter_playlist_ids"]
+	"playlist_ids": ["enter_playlist_ids"],
+	"output_bitrate": 256000
 }

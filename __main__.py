@@ -8,6 +8,7 @@ import json
 import os
 import sys
 import shutil
+from convert import convert
 
 if not os.path.exists(config["target_music_directory"] + "/songs"):
 	os.mkdir(config["target_music_directory"] + "/songs")
@@ -152,6 +153,15 @@ input("Finished renaming " + str(len(all_files)) + " files. Press enter to conti
 music_files = {
 	"isrc": "filepath"
 }
+
+all_files = indexer.get_all_files(config["target_music_directory"] + "/songs")
+
+for file in all_files:
+	if not file.endswith("mp3"):
+		print("Converting non-mp3:", file)
+		convert(i=file, o=os.path.splitext(file)[0] + '.mp3', bitrate=config["output_bitrate"])
+
+input("Finished converting all files to mp3, press enter to continue")
 
 all_files = indexer.get_all_files(config["target_music_directory"] + "/songs")
 

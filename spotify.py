@@ -49,7 +49,7 @@ def get_request(url, headers = {}, ratelimited = False, nocache = False):
 
 	try:
 		if cached_requests[url] and not nocache:
-			print("Found cached request for", url)
+			#print("Found cached request for", url)
 			return cached_requests[url]
 	except:
 		pass
@@ -109,7 +109,7 @@ def download_image(url, path):
 	with open(path, "wb") as file:
 		file.write(data)
 
-def search_for_track(name = "", artist = "", isrc = None):
+def search_for_track(name = "", artist = "", isrc = None, all_results = False):
 	global headers
 
 	try:
@@ -132,9 +132,15 @@ def search_for_track(name = "", artist = "", isrc = None):
 		).json()
 	else:
 		result = get_request(
-			f"{config["spotify_api_root"]}/search?q=isrc:{isrc}&type=track&limit=5&offset=0",
+			f"{config["spotify_api_root"]}/search?q=isrc:{isrc}&type=track&limit=3&offset=0",
 			headers = _headers
 		).json()
+
+	if all_results:
+		all_results_data = []
+		for track in result["tracks"]["items"]:
+			all_results_data.append(Track(TrackObject = track))
+		return all_results_data
 
 	#try a strict artist match, then fallback to first result (strict case insensitive)
 	if artist and not isrc:

@@ -134,7 +134,8 @@ def write_metadata(filepath, track: Track):
 
 		audio.save()
 
-	os.remove(thumbnail_path)
+	if thumbnail_path:
+		os.remove(thumbnail_path)
 
 	if not audio:
 		raise TypeError("Filepath given was not an recognized audio format (mp3, m4a, flac). If this is an audio format, consider adding it in metadata.py")

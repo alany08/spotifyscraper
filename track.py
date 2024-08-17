@@ -38,7 +38,8 @@ class Track:
 			try:
 				self.genres.append(artist["genre"])
 			except:
-				print("No genres for artist", artist["name"])
+				pass
+				# print("No genres for artist", artist["name"])
 		self.disc_no = str(TrackObject["disc_number"])
 		self.track_no = str(TrackObject["track_number"])
 		self.spotify_id = TrackObject["id"]
