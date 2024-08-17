@@ -8,7 +8,9 @@ import json
 import os
 import sys
 import shutil
-from convert import convert
+import convert
+import threading
+import time
 
 if not os.path.exists(config["target_music_directory"] + "/songs"):
 	os.mkdir(config["target_music_directory"] + "/songs")
@@ -159,9 +161,16 @@ all_files = indexer.get_all_files(config["target_music_directory"] + "/songs")
 for file in all_files:
 	if not file.endswith("mp3"):
 		print("Queuing convert:", file)
-		convert(i=file, o=os.path.splitext(file)[0] + '.mp3', bitrate=config["output_bitrate"])
+		convert.convert(i=file, o=os.path.splitext(file)[0] + '.mp3', bitrate=config["output_bitrate"])
 
-input("Finished converting all files to mp3, press enter to continue")
+while threading.active_count() != 1:
+	print(f"Active threads: {threading.active_count() - 1} Processed: {convert._processed_count}/{len(all_files)}", end=f"{' '*50}\r", flush=True)
+	time.sleep(0.01)
+
+sys.stdout.flush()
+os.system("reset")
+
+input("\n\rFinished converting all files to mp3, press enter to continue")
 
 all_files = indexer.get_all_files(config["target_music_directory"] + "/songs")
 
