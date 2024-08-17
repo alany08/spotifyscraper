@@ -19,11 +19,13 @@ def write_metadata(filepath, track: Track):
 		print("TO")
 		print(track)
 		input("Press enter to confirm")
-	try:
-		thumbnail_path = track.isrc + ".png"
-		download_image(track.cover_image_url, thumbnail_path)
-	except:
-		thumbnail_path = None
+	thumbnail_path = None
+	if track.cover_image_url:
+		try:
+			thumbnail_path = track.isrc + ".png"
+			download_image(track.cover_image_url, thumbnail_path)
+		except:
+			thumbnail_path = None
 
 	audio = None
 
