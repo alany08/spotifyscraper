@@ -3,6 +3,7 @@ import ffmpeg
 import threading
 from config import config
 import time
+import metadata
 
 _processed_count = 0
 
@@ -16,6 +17,8 @@ def convert(i="", o="", bitrate=256000, total=-1):
 
 def _convert(i="", o="", bitrate=256000):
 	global _processed_count
+	song_data = metadata.get_metadata(i)
 	ffmpeg.input(i).output(o, ab=str(bitrate), map_metadata=0, id3v2_version=3, loglevel="quiet").run()
 	os.remove(i)
+	metadata.write_metadata(o, song_data)
 	_processed_count += 1

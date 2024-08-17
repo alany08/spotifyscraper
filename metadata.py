@@ -50,7 +50,7 @@ def write_metadata(filepath, track: Track):
 		#add artist
 		audio["artist"] = track.artists
 		#add track number
-		audio["tracknumber"] = track.track_no  + "/" + track.totaltracks
+		audio["tracknumber"] = str(track.track_no)  + "/" + str(track.totaltracks)
 		#disc number, we don't have the info for total # of tracks
 		audio["discnumber"] = track.disc_no 
 		#add album
