@@ -158,7 +158,7 @@ all_files = indexer.get_all_files(config["target_music_directory"] + "/songs")
 
 for file in all_files:
 	if not file.endswith("mp3"):
-		print("Converting non-mp3:", file)
+		print("Queuing convert:", file)
 		convert(i=file, o=os.path.splitext(file)[0] + '.mp3', bitrate=config["output_bitrate"])
 
 input("Finished converting all files to mp3, press enter to continue")
