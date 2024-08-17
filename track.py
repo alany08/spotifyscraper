@@ -32,7 +32,7 @@ class Track:
 			"totaltracks": self.totaltracks
 		}, indent=4)
 	def overwrite_with_spotify(self, TrackObject):
-		self.name = TrackObject["name"][:64] #truncate names that are too long
+		self.name = TrackObject["name"]
 		for artist in TrackObject["artists"]:
 			self.artists.append(artist["name"])
 			try:

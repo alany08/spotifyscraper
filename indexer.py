@@ -27,7 +27,7 @@ def rename_files_by_metadata(files):
 		ext = f.split(".")[-1]
 		dirname = os.path.split(f)[0]
 		metadata = get_metadata(f)
-		target_fname = dirname + "/" + sanitize_filename(f"{metadata.name} - {", ".join(metadata.artists)}.{metadata.isrc}.{ext}")
+		target_fname = dirname + "/" + sanitize_filename(f"{metadata.name[:32]} - {", ".join(metadata.artists)[:32]}.{metadata.isrc}.{ext}")
 		if f != target_fname:
 			print("Moving", f, "to", target_fname)
 			if os.path.exists(target_fname):
