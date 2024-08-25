@@ -18,7 +18,11 @@ def convert(i="", o="", bitrate=256000, total=-1):
 def _convert(i="", o="", bitrate=256000):
 	global _processed_count
 	song_data = metadata.get_metadata(i)
-	ffmpeg.input(i).output(o, ab=str(bitrate), map_metadata=0, id3v2_version=3, loglevel="quiet").run()
+	try:
+		ffmpeg.input(i).output(o, ab=str(bitrate), map_metadata=0, id3v2_version=3, loglevel="quiet").run(overwrite_output=True)
+	except Exception as e:
+		print("Error converting", i)
+		print(e)
 	os.remove(i)
 	metadata.write_metadata(o, song_data)
 	_processed_count += 1
