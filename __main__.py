@@ -12,6 +12,12 @@ import convert
 import threading
 import time
 
+def nothing(a):
+	return "y"
+
+#input = nothing
+#temporary noconfirm
+
 if not os.path.exists(config["target_music_directory"] + "/songs"):
 	os.mkdir(config["target_music_directory"] + "/songs")
 

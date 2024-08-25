@@ -211,7 +211,10 @@ def get_metadata(filepath):
 			try:
 				track.isrc = audio["xid "][0].split(":")[-1]
 			except Exception:
-				pass
+				try:
+					track.isrc = audio["----:com.apple.iTunes:ISRC"][0].upper().decode()
+				except Exception:
+					pass
 		try:
 			track.spotify_id = audio["\xa9cmt"].split("\n")[1].split(":")[1]
 		except Exception:
