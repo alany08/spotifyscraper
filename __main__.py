@@ -15,7 +15,7 @@ import time
 def nothing(a):
 	return "y"
 
-#input = nothing
+input = nothing
 #temporary noconfirm
 
 if not os.path.exists(config["target_music_directory"] + "/songs"):

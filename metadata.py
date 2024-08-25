@@ -10,15 +10,16 @@ import sys
 
 def write_metadata(filepath, track: Track):
 	curr_data = get_metadata(filepath)
-	if curr_data.isrc != track.isrc and curr_data.isrc:
-		print("MODIFYING ISRC")
-		print(f"{curr_data.isrc} -> {track.isrc}")
-		print(filepath)
-		print("FROM")
-		print(curr_data)
-		print("TO")
-		print(track)
-		input("Press enter to confirm")
+	if curr_data.isrc:
+		if curr_data.isrc.strip() != track.isrc.strip():
+			print("MODIFYING ISRC")
+			print(f"{curr_data.isrc} -> {track.isrc}")
+			print(filepath)
+			print("FROM")
+			print(curr_data)
+			print("TO")
+			print(track)
+			input("Press enter to confirm")
 	thumbnail_path = None
 	if track.cover_image_url:
 		try:

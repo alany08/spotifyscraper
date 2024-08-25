@@ -35,8 +35,9 @@ cached_requests = {
 try:
 	with open("tmp/apicache.pickle", "rb") as f:
 		cached_requests = pickle.load(f)
-except Exception:
+except Exception as e:
 	print("Couldn't load response cache")
+	print(e)
 
 #90 requests every 30 seconds
 
